@@ -1,0 +1,29 @@
+{
+  "name": "@primer/figma-action",
+  "version": "1.0.0-alpha.3",
+  "description": "GitHub action for exporting figma components.",
+  "scripts": {
+    "start": "node entrypoint.js"
+  },
+  "repository": "https://github.com/primer/figma-action",
+  "bugs": {
+    "url": "https://github.com/primer/figma-action/issues"
+  },
+  "keywords": [
+    "github",
+    "design-system",
+    "figma",
+    "design",
+    "image",
+    "exporter"
+  ],
+  "author": "GitHub, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "figma-js": "^1.6.0",
+    "fs-extra": "^7.0.0",
+    "got": "^8.3.0",
+    "p-queue": "^2.4.2",
+    "sanitize-filename": "^1.6.3"
+  }
+}
