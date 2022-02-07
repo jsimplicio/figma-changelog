@@ -5,6 +5,7 @@ const Figma = require('figma-js')
 const {FIGMA_TOKEN, FIGMA_FILE_URL} = process.env
 const PQueue = require('p-queue')
 const sanitize = require("sanitize-filename")
+require('dotenv').config()
 
 const options = {
   format: 'jpg',

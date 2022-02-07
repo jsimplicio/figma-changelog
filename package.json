@@ -20,6 +20,7 @@
   "author": "GitHub, Inc.",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.0",
     "figma-js": "^1.6.0",
     "fs-extra": "^7.0.0",
     "got": "^8.3.0",
