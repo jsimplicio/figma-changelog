@@ -44,23 +44,24 @@ client.file(fileId)
   .then(({ data }) => {
     console.log('Processing response')
     const components = {}
-
+    // const instances = {}
+    var characters = ''
     function check(c) {
-      if (c.type === 'COMPONENT') {
+
+    
+  
+      if (c.type === 'INSTANCE' && c.name === 'Release') {
+        console.log(c.name, c.children[0].characters)
+        characters = c.children[0].characters
+     
         const {name, id} = c
-        const {description = '', key} = data.components[c.id]
-        const {width, height} = c.absoluteBoundingBox
-        const filename = `${sanitize(name).toLowerCase()}.${options.format}`;
+
 
         components[id] = {
           name,
-          filename,
-          id,
-          key,
-          file: fileId,
-          description,
-          width,
-          height
+
+          characters,
+       
         }
       } else if (c.children) {
         // eslint-disable-next-line github/array-foreach
@@ -75,55 +76,55 @@ client.file(fileId)
     console.log(`${Object.values(components).length} components found in the figma file`)
     return components
   })
-  .then(components => {
-    console.log('Getting export urls')
-    return client.fileImages(
-      fileId,
-      {
-        format: options.format,
-        ids: Object.keys(components),
-        scale: options.scale
-      }
-    ).then(({data}) => {
-      for(const id of Object.keys(data.images)) {
-        components[id].image = data.images[id]
-      }
-      return components
-    })
-  })
+  // .then(components => {
+  //   console.log('Getting export urls')
+  //   return client.fileImages(
+  //     fileId,
+  //     {
+  //       format: options.format,
+  //       ids: Object.keys(components),
+  //       scale: options.scale
+  //     }
+  //   ).then(({data}) => {
+  //     for(const id of Object.keys(data.images)) {
+  //       components[id].image = data.images[id]
+  //     }
+  //     return components
+  //   })
+  // })
   .then(components => {
     return ensureDir(join(options.outputDir))
       .then(() => writeFile(resolve(options.outputDir, 'data.json'), JSON.stringify(components), 'utf8'))
       .then(() => components)
   })
-  .then(components => {
-    const contentTypes = {
-      'svg': 'image/svg+xml',
-      'png': 'image/png',
-      'jpg': 'image/jpeg'
-    }
-    return queueTasks(Object.values(components).map(component => () => {
-      return got.get(component.image, {
-        headers: {
-          'Content-Type': contentTypes[options.format]
-        },
-        encoding: (options.format === 'svg' ? 'utf8' : null)
-      })
-      .then(response => {
-        return ensureDir(join(options.outputDir, options.format))
-          .then(() => writeFile(join(options.outputDir, options.format, component.filename), response.body, (options.format === 'svg' ? 'utf8' : 'binary')))
-      })
-    }))
-  })
+  // .then(components => {
+  //   const contentTypes = {
+  //     'svg': 'image/svg+xml',
+  //     'png': 'image/png',
+  //     'jpg': 'image/jpeg'
+  //   }
+  //   return queueTasks(Object.values(components).map(component => () => {
+  //     return got.get(component.image, {
+  //       headers: {
+  //         'Content-Type': contentTypes[options.format]
+  //       },
+  //       encoding: (options.format === 'svg' ? 'utf8' : null)
+  //     })
+  //     .then(response => {
+  //       return ensureDir(join(options.outputDir, options.format))
+  //         .then(() => writeFile(join(options.outputDir, options.format, component.filename), response.body, (options.format === 'svg' ? 'utf8' : 'binary')))
+  //     })
+  //   }))
+  // })
   .catch(error => {
     throw Error(`Error fetching components from Figma: ${error}`)
   })
 
-function queueTasks(tasks, options) {
-  const queue = new PQueue(Object.assign({concurrency: 3}, options))
-  for (const task of tasks) {
-    queue.add(task)
-  }
-  queue.start()
-  return queue.onIdle()
-}
+// function queueTasks(tasks, options) {
+//   const queue = new PQueue(Object.assign({concurrency: 3}, options))
+//   for (const task of tasks) {
+//     queue.add(task)
+//   }
+//   queue.start()
+//   return queue.onIdle()
+// }
