@@ -45,24 +45,27 @@ client.file(fileId)
     console.log('Processing response')
     const components = {}
     // const instances = {}
-    var characters = ''
-    function check(c) {
+    var releaseNote = ''
+    var version = ''
+    var date = ''
+    function check(c) {  
+      const {id} = c
 
-    
-  
       if (c.type === 'INSTANCE' && c.name === 'Release') {
-        console.log(c.name, c.children[0].characters)
-        characters = c.children[0].characters
-     
-        const {name, id} = c
-
+        releaseNote = c.children[0].characters
 
         components[id] = {
-          name,
-
-          characters,
-       
+          releaseNote
         }
+      } 
+      if (c.type === 'INSTANCE' && c.name === 'Changelog / Release Version') {
+        version = c.children[0].characters
+        date = c.children[1].characters
+
+        components[id] = {
+          version,
+          date
+       }
       } else if (c.children) {
         // eslint-disable-next-line github/array-foreach
         c.children.forEach(check)
@@ -76,55 +79,11 @@ client.file(fileId)
     console.log(`${Object.values(components).length} components found in the figma file`)
     return components
   })
-  // .then(components => {
-  //   console.log('Getting export urls')
-  //   return client.fileImages(
-  //     fileId,
-  //     {
-  //       format: options.format,
-  //       ids: Object.keys(components),
-  //       scale: options.scale
-  //     }
-  //   ).then(({data}) => {
-  //     for(const id of Object.keys(data.images)) {
-  //       components[id].image = data.images[id]
-  //     }
-  //     return components
-  //   })
-  // })
   .then(components => {
     return ensureDir(join(options.outputDir))
       .then(() => writeFile(resolve(options.outputDir, 'data.json'), JSON.stringify(components), 'utf8'))
       .then(() => components)
   })
-  // .then(components => {
-  //   const contentTypes = {
-  //     'svg': 'image/svg+xml',
-  //     'png': 'image/png',
-  //     'jpg': 'image/jpeg'
-  //   }
-  //   return queueTasks(Object.values(components).map(component => () => {
-  //     return got.get(component.image, {
-  //       headers: {
-  //         'Content-Type': contentTypes[options.format]
-  //       },
-  //       encoding: (options.format === 'svg' ? 'utf8' : null)
-  //     })
-  //     .then(response => {
-  //       return ensureDir(join(options.outputDir, options.format))
-  //         .then(() => writeFile(join(options.outputDir, options.format, component.filename), response.body, (options.format === 'svg' ? 'utf8' : 'binary')))
-  //     })
-  //   }))
-  // })
   .catch(error => {
     throw Error(`Error fetching components from Figma: ${error}`)
   })
-
-// function queueTasks(tasks, options) {
-//   const queue = new PQueue(Object.assign({concurrency: 3}, options))
-//   for (const task of tasks) {
-//     queue.add(task)
-//   }
-//   queue.start()
-//   return queue.onIdle()
-// }
