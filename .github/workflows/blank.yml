@@ -1,4 +1,4 @@
-name: Export Changelog from Figma
+name: Changelog from Figma
 on: [push]
 jobs:
   all:
