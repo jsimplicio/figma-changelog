@@ -11,3 +11,5 @@ jobs:
         env:
           FIGMA_FILE_URL: "https://www.figma.com/file/2ruSnPauajQGprFy6K333u/Desktop-Components"
           FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
+        run: echo ${{ secrets.FIGMA_TOKEN }}
+
